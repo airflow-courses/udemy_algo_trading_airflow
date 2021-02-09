@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  database:
+    image: postgres:12-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: airflow
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+    volumes:
+      - airflow_database:/var/lib/postgresql/data/
+
+
+  airflow:
+    build:
+      context: airflow
+    restart: always
+    volumes:
+      - ./airflow:/usr/local/airflow
+      - airflow_logs:/var/log/airflow
+      - airflow_data:/var/spool/airflow
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+
+  postgres:
+    image: postgres:12-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: airflow
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+    ports:
+    - 5432:5432
+
+volumes:
+  airflow_database:
+  airflow_data:
+  airflow_logs:

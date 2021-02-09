@@ -1,0 +1,35 @@
+stages:
+  - build
+  - deploy
+  - cleanup
+
+
+build:
+  stage: build
+  only: [master]
+  script:
+    - docker stack down airflow
+    - docker build --tag airflow:latest ./airflow
+    - docker tag airflow:latest airflow:`date +"%Y%m%d-%H%M%S"`
+    - sleep 15  # wait for normal network shutdown if the build was too fast
+
+
+deploy:
+  stage: deploy
+  only: [master]
+  script:
+    - cp $CREDENTIALS ./.env
+    - docker stack deploy --compose-file docker-compose.yml airflow
+
+
+cleanup:
+  stage: cleanup
+  only: [master]
+  script:
+    - docker container prune
+    - >  # remove old images except latest + 3
+      docker rmi $( \
+        docker images \
+        | tac \
+        | awk '/airflow/ && !/latest/ {x++; if (x>3) printf "%s:%s ", $1, $2}' \
+      )
