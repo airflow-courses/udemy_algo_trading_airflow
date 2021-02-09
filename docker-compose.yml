@@ -29,9 +29,9 @@ services:
     image: postgres:12-alpine
     restart: always
     environment:
-      POSTGRES_DB: airflow
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: stocks
+      POSTGRES_USER: trader
+      POSTGRES_PASSWORD: income
     ports:
     - 5432:5432
 
