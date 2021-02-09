@@ -16,4 +16,4 @@ airflow/.local/
 airflow/logs
 airflow/dags/billing/notebooks/.ipynb_checkpoints/
 .ipynb_checkpoints/
-airflow/tinkoff.cfg
+#airflow/tinkoff.cfg
