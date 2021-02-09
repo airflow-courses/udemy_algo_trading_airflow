@@ -1,10 +1,3 @@
-# VERSION 1.10.9
-# AUTHOR: Matthieu "Puckel_" Roisil
-# MODIFIED: Alexey Morgunov
-# DESCRIPTION: Airflow container with MS pyodbc driver
-# BUILD: docker build --rm -t docker-airflow .
-# SOURCE: https://github.com/puckel/docker-airflow
-
 FROM python:3.8-slim
 LABEL maintainer="Puckel_"
 
@@ -96,14 +89,6 @@ RUN set -ex \
         /usr/share/doc \
         /usr/share/doc-base
 
-# Install microsoft odbc driver. And fix mssql openssl problem
-#RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-#    && curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list \
-#    && apt-get update \
-#    && ACCEPT_EULA=Y apt-get install msodbcsql17 -y \
-#    && chmod +rwx /etc/ssl/openssl.cnf \
-#    && sed -i 's/TLSv1.2/TLSv1/g' /etc/ssl/openssl.cnf \
-#    && sed -i 's/SECLEVEL=2/SECLEVEL=1/g' /etc/ssl/openssl.cnf
 
 RUN mkdir -p /var/log/airflow /var/spool/airflow \
     && chown -R airflow: ${AIRFLOW_USER_HOME} \
