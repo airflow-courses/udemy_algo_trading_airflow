@@ -89,6 +89,7 @@ RUN set -ex \
         /usr/share/doc \
         /usr/share/doc-base
 
+
 RUN mkdir -p /var/log/airflow /var/spool/airflow \
     && chown -R airflow: ${AIRFLOW_USER_HOME} \
     && chown -R airflow: /var/log/airflow \
