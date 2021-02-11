@@ -4,26 +4,30 @@ from configparser import ConfigParser
 from datetime import datetime, timedelta
 
 
-def _get_api_params_from_config():
+def _get_api_params_from_config() -> dict:
     config_parser = ConfigParser()
     config_parser.read('/usr/local/airflow/tinkoff.cfg')
 
     return {
         'token': config_parser.get('core', 'TOKEN_TINKOFF'),
-        'use_sandbox': config_parser.get('core', 'USE_SANDBOX'),
+        'use_sandbox': config_parser.get('core', 'USE_SANDBOX')
     }
 
 
-def get_daily_data_by_ticker(ticker: str, period: int = 365) -> pd.DataFrame:
+def get_data_by_ticker_and_period(
+        ticker: str,
+        period_in_days: int = 365,
+        freq: tinvest.CandleResolution = tinvest.CandleResolution.day
+) -> pd.DataFrame:
     client = tinvest.SyncClient(**_get_api_params_from_config())
     ticker_data = client.get_market_search_by_ticker(ticker)
     figi = ticker_data.payload.instruments[0].figi
 
     raw_data = client.get_market_candles(
         figi,
-        datetime.now() - timedelta(days=period),
+        datetime.now() - timedelta(days=period_in_days),
         datetime.now(),
-        tinvest.schemas.CandleResolution.day,
+        freq,
     )
 
     return pd.DataFrame(
