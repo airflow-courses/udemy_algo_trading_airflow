@@ -4,7 +4,7 @@ from configparser import ConfigParser
 from datetime import datetime, timedelta
 
 
-def get_api_params_from_config():
+def _get_api_params_from_config():
     config_parser = ConfigParser()
     config_parser.read('/usr/local/airflow/tinkoff.cfg')
 
@@ -15,7 +15,7 @@ def get_api_params_from_config():
 
 
 def get_daily_data_by_ticker(ticker: str, period: int = 365) -> pd.DataFrame:
-    client = tinvest.SyncClient(**get_api_params_from_config())
+    client = tinvest.SyncClient(**_get_api_params_from_config())
     ticker_data = client.get_market_search_by_ticker(ticker)
     figi = ticker_data.payload.instruments[0].figi
 

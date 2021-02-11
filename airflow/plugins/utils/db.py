@@ -5,7 +5,7 @@ from airflow.hooks.base import BaseHook
 import pandas as pd
 
 
-def get_db_url(connector: str) -> str:
+def _get_db_url(connector: str) -> str:
     connection = BaseHook.get_connection(connector)
 
     return f'user={connection.login} password={connection.password} host={connection.host} ' \
@@ -23,7 +23,7 @@ def load_df_to_db(connector: str, df: pd.DataFrame, table_name: str) -> None:
         DELIMITER '|'
         NULL 'NUL'
     """
-    conn = psycopg2.connect(dsn=get_db_url(connector))
+    conn = psycopg2.connect(dsn=_get_db_url(connector))
     with conn.cursor() as cursor:
         cursor.copy_expert(copy_query, buffer)
     conn.commit()
