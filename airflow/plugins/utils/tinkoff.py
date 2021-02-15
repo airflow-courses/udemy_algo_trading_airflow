@@ -26,7 +26,7 @@ def get_data_by_ticker_and_period(
     raw_data = client.get_market_candles(
         figi,
         datetime.now() - timedelta(days=period_in_days),
-        datetime.now(),
+        datetime.now() - timedelta(days=1),
         freq,
     )
 
