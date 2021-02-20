@@ -35,7 +35,7 @@ def bollinger_bands_strategy(
         dev: int,
 ) -> pd.DataFrame:
     data['sma'] = data['close'].rolling(sma).mean()
-    std = data['close'].rolling(SMA).std() * dev
+    std = data['close'].rolling(sma).std() * dev
     data['lower'] = data['sma'] - std
     data['upper'] = data['sma'] + std
 
@@ -45,5 +45,6 @@ def bollinger_bands_strategy(
     data['position'] = np.where(data['distance'] * data['distance'].shift(1) < 0,
                                 0, data['position'])
     data['position'] = data['position'].ffill().fillna(0)
+    data['position'] = data['position'].astype('int8')
 
     return data[['time', 'position']].tail(1).assign(strategy_type='bollinger')
