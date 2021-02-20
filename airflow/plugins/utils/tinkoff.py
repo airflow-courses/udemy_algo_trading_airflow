@@ -50,3 +50,8 @@ def get_data_by_ticker_and_period(
             'volume',
         )
     )
+
+
+def check_position_by_ticker(ticker: str):
+    client = tinvest.SyncClient(**_get_api_params_from_config())
+    client.get_portfolio()
