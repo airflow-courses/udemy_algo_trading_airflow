@@ -30,7 +30,7 @@ def load_df_to_db(connector: str, df: pd.DataFrame, table_name: str) -> None:
     conn.close()
 
 
-def get_data_from_table(connector: str, table_name: str, filter_: str = None) -> pd.DataFrame:
+def get_data_from_price_table(connector: str, table_name: str, filter_: str = None) -> pd.DataFrame:
     query = f"""
         SELECT time,
                open,
@@ -45,3 +45,29 @@ def get_data_from_table(connector: str, table_name: str, filter_: str = None) ->
         data = pd.read_sql(query, conn)
 
     return data
+
+
+def get_data_from_signal_table(connector: str, filter_: str) -> pd.DataFrame:
+    query = f"""
+        SELECT time,
+               position,
+               strategy_type,
+               ticker
+        FROM signal
+        {filter_}
+    """
+    with psycopg2.connect(dsn=_get_db_url(connector)) as conn:
+        data = pd.read_sql(query, conn)
+
+    return data
+
+
+def get_last_price_from_price_table(connector: str, table_name: str) -> float:
+    data = get_data_from_price_table(
+        connector,
+        table_name,
+        f"WHERE time = (SELECT max(time) FROM {table_name})"
+    )
+    data = data.sort_values(by='time', ascending=False)
+
+    return data.iloc[0]['close']
