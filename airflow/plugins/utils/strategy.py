@@ -11,7 +11,7 @@ def apply_strategy(
         strategy_func: Callable,
         op_kwargs: dict
 ) -> None:
-    data = db.get_data_from_table(connector, source_table_name)
+    data = db.get_data_from_price_table(connector, source_table_name)
     signal = strategy_func(data, **op_kwargs).assign(ticker=ticker)
     db.load_df_to_db(connector, signal, 'signal')
 

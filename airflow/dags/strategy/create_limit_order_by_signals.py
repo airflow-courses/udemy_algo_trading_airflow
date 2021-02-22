@@ -1,15 +1,19 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
-from utils import strategy
+from utils import order
 from datetime import timedelta
 import os
 
 DAG_ID = os.path.basename(__file__).replace('.pyc', '').replace('.py', '')
 CONN_ID = 'postgres_stocks'
 
-SMA_SHORT = 50
-SMA_LONG = 200
+STRATEGY_WEIGHTS = {
+    'sma': 0.7,
+    'bollinger': 0.3,
+}
+
+THRESHOLD = 0.5
 
 default_args = {
     'owner': 'airflow',
@@ -24,5 +28,16 @@ default_args = {
 with DAG(
     dag_id=DAG_ID,
     default_args=default_args,
-    schedule_interval='10 1 * * *',
+    schedule_interval='20 1 * * *',
 ) as dag:
+
+    create_limit_order_aapl = PythonOperator(
+        task_id='create_limit_order_aapl',
+        python_callable=order.create_limit_order_by_signals,
+        op_kwargs={
+            'connector': CONN_ID,
+            'ticker': 'AAPL',
+            'weights': STRATEGY_WEIGHTS,
+            'threshold': THRESHOLD,
+        }
+    )
