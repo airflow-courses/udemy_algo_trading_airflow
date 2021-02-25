@@ -1,15 +1,12 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
-from utils import strategy
+from utils import db, tinkoff
 from datetime import timedelta
 import os
 
 DAG_ID = os.path.basename(__file__).replace('.pyc', '').replace('.py', '')
 CONN_ID = 'postgres_stocks'
-
-SMA_SHORT = 50
-SMA_LONG = 200
 
 default_args = {
     'owner': 'airflow',
@@ -24,20 +21,18 @@ default_args = {
 with DAG(
     dag_id=DAG_ID,
     default_args=default_args,
-    schedule_interval='10 1 * * *',
+    schedule_interval='5 1 * * *',
 ) as dag:
 
-    cross_sma_aapl = PythonOperator(
-        task_id='cross_sma_aapl',
-        python_callable=strategy.apply_strategy,
+    update_stock_prices_aapl = PythonOperator(
+        task_id='update_stock_prices_aapl',
+        python_callable=db.load_df_to_db,
         op_kwargs={
             'connector': CONN_ID,
-            'source_table_name': 'aapl',
-            'ticker': 'AAPL',
-            'strategy_func': strategy.cross_sma_strategy,
-            'op_kwargs': {
-                'sma_short': SMA_SHORT,
-                'sma_long': SMA_LONG,
-            }
+            'df': tinkoff.get_data_by_ticker_and_period(
+                'AAPL',
+                2,
+            ).tail(1),
+            'table_name': 'aapl',
         }
     )

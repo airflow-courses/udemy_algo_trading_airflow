@@ -2,6 +2,7 @@ import tinvest
 import pandas as pd
 from configparser import ConfigParser
 from datetime import datetime, timedelta
+from typing import Optional
 
 
 def _get_api_params_from_config() -> dict:
@@ -14,7 +15,7 @@ def _get_api_params_from_config() -> dict:
     }
 
 
-def get_figi_by_ticker(ticker: str) -> str:
+def get_figi_from_ticker(ticker: str) -> str:
     client = tinvest.SyncClient(**_get_api_params_from_config())
     ticker_data = client.get_market_search_by_ticker(ticker)
     return ticker_data.payload.instruments[0].figi
@@ -26,7 +27,7 @@ def get_data_by_ticker_and_period(
         freq: tinvest.CandleResolution = tinvest.CandleResolution.day
 ) -> pd.DataFrame:
     client = tinvest.SyncClient(**_get_api_params_from_config())
-    figi = get_figi_by_ticker(ticker)
+    figi = get_figi_from_ticker(ticker)
 
     raw_data = client.get_market_candles(
         figi,
@@ -57,7 +58,7 @@ def get_data_by_ticker_and_period(
     )
 
 
-def get_position_by_ticker(ticker: str):
+def get_position_by_ticker(ticker: str) -> Optional[tinvest.PortfolioPosition]:
     client = tinvest.SyncClient(**_get_api_params_from_config())
     positions = client.get_portfolio().payload.positions
 
@@ -96,3 +97,14 @@ def get_current_balance(currency_type: str) -> float:
     if len(filtered_currencies) == 0:
         return 0.0
     return float(filtered_currencies[0].balance)
+
+
+
+
+
+
+
+
+
+
+
