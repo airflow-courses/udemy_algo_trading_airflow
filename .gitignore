@@ -15,3 +15,6 @@ airflow/logs
 airflow/dags/billing/notebooks/.ipynb_checkpoints/
 .ipynb_checkpoints/
 airflow/tinkoff.cfg
+tinkoff.cfg
+notebooks
+airflow.pdf
